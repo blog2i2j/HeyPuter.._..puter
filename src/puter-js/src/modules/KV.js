@@ -10,6 +10,7 @@ const gui_cache_keys = [
     'user_preferences.show_hidden_files',
     'user_preferences.language',
     'user_preferences.clock_visible',
+    'toolbar_auto_hide_enabled',
     'has_seen_welcome_window',
 ];
 
@@ -177,6 +178,19 @@ class KV{
         }
 
         return utils.make_driver_method(['key'], 'puter-kvstore', undefined, 'decr').call(this, options);
+    }
+
+    expire = async(...args) => {
+        let options = {};
+        options.key = args[0];
+        options.seconds = args[1];
+        
+        // key size cannot be larger than MAX_KEY_SIZE
+        if(options.key.length > this.MAX_KEY_SIZE){
+            throw ({message: 'Key size cannot be larger than ' + this.MAX_KEY_SIZE, code: 'key_too_large'});
+        }
+
+        return utils.make_driver_method(['key'], 'puter-kvstore', undefined, 'expire').call(this, options);
     }
 
     // resolves to 'true' on success, or rejects with an error on failure

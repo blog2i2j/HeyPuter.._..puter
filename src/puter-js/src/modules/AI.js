@@ -136,9 +136,31 @@ class AI{
             options = { text: args[0] };
         }
 
-        // if second argument is string, it's the language
+        // * ai.txt2speech('Hello, world!', 'en-US')
+        // * ai.txt2speech('Hello, world!', 'en-US', 'Brian')
         if (args[1] && typeof args[1] === 'string') {
-            options.language = args[1];
+            
+            // Determine language
+            if (args[1] && typeof args[1] === 'string') {
+                // Check if it's a language code (ISO 639-1 or with region)
+                // Pattern matches: en, es, fr, de, en-US, es-ES, fr-FR, etc.
+                const languageCodePattern = /^[a-z]{2}(-[A-Z]{2})?$/;
+
+                // if language code is invalid, throw an error
+                if(!languageCodePattern.test(args[1])){
+                    throw { message: 'Invalid language code', code: 'invalid_language_code' };
+                }
+
+                // set language
+                options.language = args[1];
+            }
+            // Determine voice
+            // Note that voice is optional, and if not provided, the default voice for the language will be used
+            // Also, it is important that a language is set before a voice is set since voices are language-specific
+            if (options.language && args[2] && typeof args[2] === 'string') {
+                // set voice
+                options.voice = args[2];
+            }
         }
 
         // check input size
@@ -311,7 +333,7 @@ class AI{
         }
 
         // o1-mini to openrouter:openai/o1-mini
-        if ( requestParams.model === 'o1-mini' || requestParams.model === 'o1-pro' ) {
+        if ( requestParams.model === 'o1-mini') {
             requestParams.model = 'openrouter:openai/o1-mini';
         }
 
